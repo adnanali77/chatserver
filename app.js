@@ -17,7 +17,7 @@ const dotenv = require('dotenv').config();
 app.use(cors({
   origin: '*',
 }));
-const uri = process.env.URL;
+const uri = 'mongodb+srv://StampaChat:goUGOq2fUPoJUvpD@cluster0.n98lqzj.mongodb.net/';
 
 async function connect() {
   try {
