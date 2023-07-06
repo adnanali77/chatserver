@@ -28,7 +28,7 @@ async function connect() {
   }
 }
 
-connect();
+connect(uri);
 
 const io = require("socket.io")(http, {
   cors: {
