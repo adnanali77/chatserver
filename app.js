@@ -1,5 +1,4 @@
-//backup serverside code
-const app = require("express")();
+const app = require("express");
 const http = require("http").createServer(app);
 const bodyParser = require('body-parser');
 app.use(bodyParser.json()); // Parse JSON bodies
@@ -19,7 +18,7 @@ app.use(cors({
 }));
 const uri = 'mongodb+srv://StampaChat:goUGOq2fUPoJUvpD@cluster0.n98lqzj.mongodb.net/';
 
-async function connect() {
+async function connect(uri) {
   try {
     await mongoose.connect(uri);
     console.log("Connected to MongoDB");
@@ -96,12 +95,7 @@ const AdminSchema = mongoose.model("Admin", {
   connectionTime: String,
 });
 
-//Schemas for members
-// const Members = mongoose.model("ChatMember", {
-//   members: {
-//     type: Array
-//   }
-// });
+
 app.post('/post', async (req, res) => {
   // console.log("Browser: " + req.headers["user-agent"]);
   try {
@@ -134,47 +128,24 @@ io.on("connection", async (socket) => {
   console.log("Operating System:", os);
   console.log("MachineInfo", userInfo().username)
   console.log("origin", socket.request.headers["origin"])
-  // si.system()
-  //   .then(data => {
-  //     console.log("Machine Manufacturer:", data.manufacturer);
-  //     console.log("Machine Model:", data.model);
-  //   })
-  //   .catch(error => {
-  //     console.error('Error retrieving system information:', error);
-  //   });
 
-  // console.log("User connected:", socket.id);
-  // console.log("User list:", users);
   const ip = socket.handshake.headers['x-real-ip'] || socket.handshake.headers['x-forwarded-for'] || socket.handshake.address;
 
-  // Convert IPv6 loopback address to IPv4 format if necessary
   const clientip = ip.includes('::1') ? '127.0.0.1' : ip;
   if (clientip == '127.0.0.1') { formattedIP = '139.135.36.80' } else {
     formattedIP = clientip;
   }
 
-  // async function setip(userName) {
-  // try {
-  // const ip = '139.135.36.80';
   const response = await fetch(`https://api.iplocation.net/?ip=${formattedIP}`);
 
   if (!response.ok) {
     throw new Error('Network response was not ok');
   }
   const results = await response.json();
-  // console.log(results)
-  // const editUser = await UserSchema.findOneAndUpdate({ userName }, { ip: ip, country_name: results.country_name, country_code2: results.country_code2 });// {...req.body}
-  // console.log("result", results)
-  // } catch (error) {
-  //   console.error('Error saving users:', error);
-  // }
-  // }
 
-  // Get the current connection time
   const connectionTime = moment().format('h:mm:ss A');
 
   socket.on("disconnect", () => {
-    // console.log("User disconnected:", socket.id);
     for (const [username, user] of users) {
       if (user.userID === socket.id) {
         users.delete(username); // Remove the user from the Map
@@ -182,11 +153,9 @@ io.on("connection", async (socket) => {
       }
     }
     io.emit("users", Array.from(users.values())); // Emit the updated users list
-    // Perform any other necessary cleanup or actions
   });
 
   socket.on("private message", async ({ content, to }) => {
-    // console.log("Content:", content, "To:", to);
 
     const conversationId = `admin_${to}`;
     let conversation = await Conversation.findOne({ conversationId });
@@ -208,7 +177,6 @@ io.on("connection", async (socket) => {
   });
 
   socket.on("private message admin", async ({ content, to, username }) => {
-    // console.log("Content:", content, "To:", to, "username", username);
 
     const conversationId = `admin_${to}`;
     let conversation = await Conversation.findOne({ conversationId });
@@ -233,10 +201,6 @@ io.on("connection", async (socket) => {
       });
     });
 
-    // socket.to(to).emit("private message", {
-    //   content,
-    //   from: socket.id,
-    // });
   });
 
   socket.on("save message", async ({ content, to, conversationID }) => {
@@ -276,8 +240,6 @@ io.on("connection", async (socket) => {
     country_code2: results.country_code2
   };
   users.set(socket.username, newUser); // Add or update the user in the Map
-
-  // console.log("Before emitting User list:", Array.from(users.values()));
 
   socket.emit("users", Array.from(users.values()));
   socket.broadcast.emit("user connected", {
@@ -327,32 +289,10 @@ io.on("connection", async (socket) => {
       console.log('User already exists:', existingUser);
     }
 
-    // if (!existingUser) {
-    //   if (existingAdmin && socket.username === "admin") {
-    //     existingAdmin.socketIDs = existingAdmin.socketIDs || []; // Initialize the socketIDs field if it doesn't exist
-
-    //     existingAdmin.socketIDs.push(socket.id);
-    //     const savedAdmin = await existingAdmin.save();
-    //     console.log('Admin user updated:', savedAdmin);
-    //   } else {
-    //     const newUser = new UserSchema({
-    //       username: socket.username,
-    //       uuid: uuidv4(),
-    //       userID: socket.id,
-    //       ip: formattedIP,
-    //       connectionTime: connectionTime
-    //     });
-    //     const savedUser = await newUser.save();
-    //     console.log('User saved:', savedUser);
-    //   }
-    // } else {
-    //   console.log('User already exists:', existingUser);
-    // }
   } catch (error) {
     console.error('Error saving users:', error);
   }
 
-  // console.log(Array.from(users.values()));
 });
 
 app.get("/messages/:conversationId", async (req, res) => {
@@ -378,7 +318,16 @@ app.post("/users", async (req, res) => {
   }
 })
 
+app.get("/", async (req, res) => {
+  try {
+    res.send("Hi from server")
+  }
+  catch (error) {
+    res.status(500).json(error)
+  }
+})
+
 const port = process.env.PORT;
 http.listen(port, () => {
-  console.log("Listening on port 4200");
+  console.log("Listening on port 4200",port);
 });
