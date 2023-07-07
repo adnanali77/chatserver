@@ -1,8 +1,7 @@
-const express = require("express");
-const http = require("http").createServer(express);
+const express = require('express');
 // const bodyParser = require('body-parser');
 const cors = require('cors');
-// const tryUser = require("./models/UserSchemas")
+const tryUser = require("./models/UserSchemas")
 const { v4: uuidv4 } = require('uuid');
 const moment = require('moment');
 const mongoose = require("mongoose");
@@ -12,6 +11,8 @@ const si = require('systeminformation');
 const dotenv = require('dotenv').config();
 
 const app = express();
+
+const http = require("http").createServer(app);
 // app.use(bodyParser.json()); // Parse JSON bodies
 // app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
@@ -324,7 +325,7 @@ app.post("/users", async (req, res) => {
 
 app.get("/", async (req, res) => {
   try {
-    res.send("Hi from server")
+    res.send("Hi from server");
   }
   catch (error) {
     res.status(500).json(error)
