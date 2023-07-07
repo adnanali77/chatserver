@@ -1,8 +1,6 @@
-const app = require("express");
-const http = require("http").createServer(app);
+const express = require("express");
+const http = require("http").createServer(express);
 const bodyParser = require('body-parser');
-app.use(bodyParser.json()); // Parse JSON bodies
-app.use(bodyParser.urlencoded({ extended: true }));
 const cors = require('cors');
 const tryUser = require("./models/UserSchemas")
 const { v4: uuidv4 } = require('uuid');
@@ -12,6 +10,10 @@ const { userInfo } = require("os");
 const UAParser = require('ua-parser-js');
 const si = require('systeminformation');
 const dotenv = require('dotenv').config();
+
+const app = express();
+app.use(bodyParser.json()); // Parse JSON bodies
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(cors({
   origin: '*',
