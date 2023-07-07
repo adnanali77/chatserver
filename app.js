@@ -261,7 +261,7 @@ io.on("connection", async (socket) => {
         const newUser = new AdminSchema({
           username: socket.username,
           uuid: uuidv4(),
-          userID: [socket.id], // Store socket.id in an array
+          userID: [socket.id],
           ip: formattedIP,
           connectionTime: connectionTime
         });
