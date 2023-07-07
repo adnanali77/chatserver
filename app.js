@@ -1,8 +1,8 @@
 const express = require("express");
 const http = require("http").createServer(express);
-const bodyParser = require('body-parser');
+// const bodyParser = require('body-parser');
 const cors = require('cors');
-const tryUser = require("./models/UserSchemas")
+// const tryUser = require("./models/UserSchemas")
 const { v4: uuidv4 } = require('uuid');
 const moment = require('moment');
 const mongoose = require("mongoose");
@@ -12,8 +12,10 @@ const si = require('systeminformation');
 const dotenv = require('dotenv').config();
 
 const app = express();
-app.use(bodyParser.json()); // Parse JSON bodies
-app.use(bodyParser.urlencoded({ extended: true }));
+// app.use(bodyParser.json()); // Parse JSON bodies
+// app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
 app.use(cors({
   origin: '*',
