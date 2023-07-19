@@ -325,7 +325,7 @@ app.post("/users", async (req, res) => {
 
 app.get("/", async (req, res) => {
   try {
-    res.send("Hi from server");
+    res.send("Hi from server.....");
   }
   catch (error) {
     res.status(500).json(error)
